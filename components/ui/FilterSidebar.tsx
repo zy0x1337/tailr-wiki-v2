@@ -7,7 +7,7 @@ import { useFilters } from '@/components/providers/FilterProvider'
 interface CompactFilterBarProps {
   pets: Array<{
     temperament?: string[] | null
-    size?: string | null
+    size?: string | null | undefined
     careLevel?: string | null
   }>
 }
@@ -17,12 +17,77 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
-  // ✅ KORRIGIERT: Helper function für Ref-Zuweisung
   const setDropdownRef = (key: string) => (el: HTMLDivElement | null) => {
     dropdownRefs.current[key] = el
   }
 
-  // ✅ KORRIGIERT: Close dropdown when clicking outside
+  // ✅ KORRIGIERT: Erweiterte normalizeSize mit getSizeOrder für Sortierung
+  const normalizeSize = (rawSize: string | null | undefined): string | null => {
+    if (!rawSize || rawSize === undefined) return null
+    
+    const size = rawSize.toLowerCase()
+    
+    // Kategorisierung basierend auf Schlüsselworten
+    if (size.includes('sehr klein') || size.includes('12-15') || size.includes('15-23') || size.includes('18-23')) {
+      return 'Sehr klein'
+    }
+    if (size.includes('klein') && !size.includes('mittel') && !size.includes('groß')) {
+      return 'Klein'
+    }
+    if (size.includes('klein-mittel') || (size.includes('klein') && size.includes('mittel'))) {
+      return 'Klein-Mittel'
+    }
+    if (size.includes('mittel') && !size.includes('groß') && !size.includes('klein')) {
+      return 'Mittel'
+    }
+    if (size.includes('mittel-groß') || (size.includes('mittel') && size.includes('groß'))) {
+      return 'Mittel-Groß'
+    }
+    if (size.includes('groß') && !size.includes('sehr') && !size.includes('mittel')) {
+      return 'Groß'
+    }
+    if (size.includes('sehr groß')) {
+      return 'Sehr groß'
+    }
+    if (size.includes('variabel')) {
+      return 'Variabel'
+    }
+    
+    // Fallback für cm-Angaben ohne Kategorie
+    const cmMatch = rawSize.match(/(\d+)[-–](\d+)\s*cm/)
+    if (cmMatch) {
+      const minSize = parseInt(cmMatch[1])
+      const maxSize = parseInt(cmMatch[2])
+      const avgSize = (minSize + maxSize) / 2
+      
+      if (avgSize <= 23) return 'Sehr klein'
+      if (avgSize <= 40) return 'Klein'
+      if (avgSize <= 50) return 'Klein-Mittel'
+      if (avgSize <= 60) return 'Mittel'
+      if (avgSize <= 70) return 'Mittel-Groß'
+      if (avgSize <= 80) return 'Groß'
+      return 'Sehr groß'
+    }
+    
+    return rawSize
+  }
+
+  // ✅ NEU: Helper-Funktion für Größen-Sortierung
+  const getSizeOrder = (size: string | null): number => {
+    const sizeOrder: Record<string, number> = {
+      'Sehr klein': 1,
+      'Klein': 2,
+      'Klein-Mittel': 3,
+      'Mittel': 4,
+      'Mittel-Groß': 5,
+      'Groß': 6,
+      'Sehr groß': 7,
+      'Variabel': 8
+    }
+    return sizeOrder[size || ''] || 999
+  }
+
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (openDropdown && dropdownRefs.current[openDropdown]) {
@@ -35,7 +100,6 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
 
     if (openDropdown) {
       document.addEventListener('mousedown', handleClickOutside)
-      // ✅ Prevent body scroll when dropdown is open
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
@@ -47,7 +111,7 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
     }
   }, [openDropdown])
 
-  // ✅ KORRIGIERT: ESC key to close dropdown
+  // ESC key to close dropdown
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && openDropdown) {
@@ -64,13 +128,12 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
     }
   }, [openDropdown])
 
-  // Extract available options
   const availableOptions = {
     sizes: [...new Set(
       pets
-        .map(p => p.size)
+        .map(p => normalizeSize(p.size))
         .filter((size): size is string => size !== null && size !== undefined)
-    )].sort(),
+    )].sort((a, b) => getSizeOrder(a) - getSizeOrder(b)),
     careLevels: [...new Set(
       pets
         .map(p => p.careLevel)
@@ -167,7 +230,7 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
           {availableOptions.sizes.length > 0 && (
             <div 
               className="relative"
-              ref={setDropdownRef('size')} // ✅ KORRIGIERT: Korrekte Ref-Verwendung
+              ref={setDropdownRef('size')}
             >
               <button
                 onClick={() => toggleDropdown('size')}
@@ -188,10 +251,8 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
               
               {openDropdown === 'size' && (
                 <>
-                  {/* ✅ Backdrop Overlay */}
                   <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" />
                   
-                  {/* ✅ Professional Dropdown mit Close Button */}
                   <div className="absolute top-full left-0 right-0 mt-2 bg-base-100 border border-base-300 rounded-xl shadow-2xl z-50 min-w-64 max-h-80 overflow-y-auto">
                     <div className="p-3 border-b border-base-300 flex items-center justify-between">
                       <div className="text-sm font-semibold text-base-content">Größe auswählen</div>
@@ -203,20 +264,34 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
                       </button>
                     </div>
                     <div className="p-2">
-                      {availableOptions.sizes.map(size => (
-                        <label key={size} className="flex items-center gap-3 p-3 hover:bg-base-200 rounded-lg cursor-pointer transition-colors">
-                          <input
-                            type="checkbox"
-                            className="checkbox checkbox-sm checkbox-primary"
-                            checked={filters.size.includes(size)}
-                            onChange={() => handleMultiSelectChange('size', size)}
-                          />
-                          <span className="text-sm font-medium">{size}</span>
-                          {filters.size.includes(size) && (
-                            <Check className="w-4 h-4 text-primary ml-auto" />
-                          )}
-                        </label>
-                      ))}
+                      {availableOptions.sizes.map(size => {
+                        const sizeEmojis: Record<string, string> = {
+                          'Sehr klein': '🐭',
+                          'Klein': '🐶',
+                          'Klein-Mittel': '🐕',
+                          'Mittel': '🦮',
+                          'Mittel-Groß': '🐕‍🦺',
+                          'Groß': '🐺',
+                          'Sehr groß': '🐕‍🦺',
+                          'Variabel': '📏'
+                        }
+                        
+                        return (
+                          <label key={size} className="flex items-center gap-3 p-3 hover:bg-base-200 rounded-lg cursor-pointer transition-colors">
+                            <input
+                              type="checkbox"
+                              className="checkbox checkbox-sm checkbox-primary"
+                              checked={filters.size.includes(size)}
+                              onChange={() => handleMultiSelectChange('size', size)}
+                            />
+                            <span className="text-lg">{sizeEmojis[size] || '📐'}</span>
+                            <span className="text-sm font-medium flex-1">{size}</span>
+                            {filters.size.includes(size) && (
+                              <Check className="w-4 h-4 text-primary" />
+                            )}
+                          </label>
+                        )
+                      })}
                     </div>
                   </div>
                 </>
@@ -228,7 +303,7 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
           {availableOptions.careLevels.length > 0 && (
             <div 
               className="relative"
-              ref={setDropdownRef('careLevel')} // ✅ KORRIGIERT: Korrekte Ref-Verwendung
+              ref={setDropdownRef('careLevel')}
             >
               <button
                 onClick={() => toggleDropdown('careLevel')}
@@ -286,7 +361,7 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
           {availableOptions.temperaments.length > 0 && (
             <div 
               className="relative"
-              ref={setDropdownRef('temperament')} // ✅ KORRIGIERT: Korrekte Ref-Verwendung
+              ref={setDropdownRef('temperament')}
             >
               <button
                 onClick={() => toggleDropdown('temperament')}
@@ -340,10 +415,10 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
             </div>
           )}
 
-          {/* Sort Dropdown */}
+          {/* ✅ KORRIGIERTER Sort Dropdown - Ohne Pflege-Sortierung */}
           <div 
             className="relative"
-            ref={setDropdownRef('sort')} // ✅ KORRIGIERT: Korrekte Ref-Verwendung
+            ref={setDropdownRef('sort')}
           >
             <button
               onClick={() => toggleDropdown('sort')}
@@ -356,51 +431,70 @@ export default function CompactFilterBar({ pets }: CompactFilterBarProps) {
             </button>
             
             {openDropdown === 'sort' && (
-              <>
-                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" />
-                <div className="absolute top-full right-0 mt-2 bg-base-100 border border-base-300 rounded-xl shadow-2xl z-50 min-w-48">
-                  <div className="p-3 border-b border-base-300 flex items-center justify-between">
-                    <div className="text-sm font-semibold text-base-content">Sortierung</div>
-                    <button
-                      onClick={() => setOpenDropdown(null)}
-                      className="btn btn-ghost btn-xs rounded-full"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="p-2">
-                    {[
-                      { value: 'name-asc', label: 'Name A-Z' },
-                      { value: 'name-desc', label: 'Name Z-A' },
-                      { value: 'size-asc', label: 'Klein → Groß' },
-                      { value: 'size-desc', label: 'Groß → Klein' },
-                      { value: 'care-asc', label: 'Pflegeleicht' },
-                      { value: 'care-desc', label: 'Anspruchsvoll' },
-                      { value: 'properties-desc', label: 'Beste Matches' }
-                    ].map(option => {
-                      const isActive = `${filters.sortBy}-${filters.sortOrder}` === option.value
-                      return (
-                        <button
-                          key={option.value}
-                          onClick={() => {
-                            const [sortBy, sortOrder] = option.value.split('-') as [typeof filters.sortBy, typeof filters.sortOrder]
-                            updateFilter('sortBy', sortBy)
-                            updateFilter('sortOrder', sortOrder)
-                            setOpenDropdown(null)
-                          }}
-                          className={`w-full text-left p-3 hover:bg-base-200 rounded-lg text-sm transition-colors flex items-center justify-between ${
-                            isActive ? 'bg-primary text-primary-content' : ''
-                          }`}
-                        >
-                          {option.label}
-                          {isActive && <Check className="w-4 h-4" />}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              </>
-            )}
+  <>
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" />
+    <div className="absolute top-full right-0 mt-2 bg-base-100 border border-base-300 rounded-xl shadow-2xl z-50 min-w-52 max-h-80 overflow-hidden">
+      <div className="p-3 border-b border-base-300 flex items-center justify-between">
+        <div className="text-sm font-semibold text-base-content">Sortierung</div>
+        <button
+          onClick={() => setOpenDropdown(null)}
+          className="btn btn-ghost btn-xs rounded-full"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+      
+      {/* ✅ SCROLLABLE CONTENT CONTAINER */}
+      <div className="max-h-64 overflow-y-auto p-2 sort-scroll">
+        {[
+          // Alphabetische Sortierung
+          { value: 'name-asc', label: 'Name A-Z', icon: '🔤', category: 'Alphabetisch' },
+          { value: 'name-desc', label: 'Name Z-A', icon: '🔤', category: 'Alphabetisch' },
+          
+          // Physische Eigenschaften
+          { value: 'size-asc', label: 'Klein → Groß', icon: '📏', category: 'Größe' },
+          { value: 'size-desc', label: 'Groß → Klein', icon: '📏', category: 'Größe' },
+          
+          // Herkunft & Geografie
+          { value: 'origin-asc', label: 'Herkunft A-Z', icon: '🌍', category: 'Herkunft' },
+          { value: 'origin-desc', label: 'Herkunft Z-A', icon: '🌍', category: 'Herkunft' },
+          
+          // Lebensdauer
+          { value: 'lifespan-asc', label: 'Kurze → Lange Lebensdauer', icon: '⏱️', category: 'Lebensdauer' },
+          { value: 'lifespan-desc', label: 'Lange → Kurze Lebensdauer', icon: '⏱️', category: 'Lebensdauer' },
+          
+          // Rasse
+          { value: 'breed-asc', label: 'Rasse A-Z', icon: '🐕', category: 'Rasse' },
+          { value: 'breed-desc', label: 'Rasse Z-A', icon: '🐕', category: 'Rasse' }
+        ].map(option => {
+          const isActive = `${filters.sortBy}-${filters.sortOrder}` === option.value
+          
+          return (
+            <button
+              key={option.value}
+              onClick={() => {
+                const [sortBy, sortOrder] = option.value.split('-') as [typeof filters.sortBy, typeof filters.sortOrder]
+                updateFilter('sortBy', sortBy)
+                updateFilter('sortOrder', sortOrder)
+                setOpenDropdown(null)
+              }}
+              className={`w-full text-left p-3 hover:bg-base-200 rounded-lg text-sm transition-colors flex items-center gap-3 ${
+                isActive ? 'bg-primary text-primary-content' : ''
+              }`}
+            >
+              <span>{option.icon}</span>
+              <div className="flex-1">
+                <div className="font-medium">{option.label}</div>
+                <div className="text-xs opacity-70">{option.category}</div>
+              </div>
+              {isActive && <Check className="w-4 h-4" />}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  </>
+)}
           </div>
         </div>
 

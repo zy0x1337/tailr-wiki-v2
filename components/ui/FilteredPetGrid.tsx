@@ -1,10 +1,12 @@
-// components/ui/FilteredPetGrid.tsx - Mit korrekten Props
+// components/ui/FilteredPetGrid.tsx - Korrigiert: ALLE Hunde werden angezeigt
+
 'use client'
 
 import { useEffect, useMemo } from 'react'
 import PetCard from './PetCard'
 import { useFilters } from '@/components/providers/FilterProvider'
 import { usePetProperties } from '@/components/providers/PetPropertiesProvider'
+import { Search, Filter } from 'lucide-react'
 
 interface Pet {
   id: number
@@ -14,12 +16,12 @@ interface Pet {
   species: string
   primaryImage?: string | null
   description: string
-  size?: string | null
+  size?: string | null | undefined
   temperament?: string[] | null
   careLevel?: string | null
   ratings?: any | null
-  origin?: string | null
-  lifeExpectancy?: string | null
+  origin?: string | null | undefined
+  lifeExpectancy?: string | null | undefined
   weight?: string | null
   properties?: string[] | null
 }
@@ -54,54 +56,117 @@ export default function FilteredPetGrid({ pets }: FilteredPetGridProps) {
     return temperament.flatMap(trait => mapping[trait] || [])
   }
 
-  // Helper function to get matching properties for a pet
-  function getMatchingProperties(pet: Pet, selectedProps: string[]): string[] {
-    const petProperties = pet.properties || mapTemperamentToProperties(pet.temperament)
-    return selectedProps.filter(prop => petProperties.includes(prop))
-  }
-
   // Helper function to count property matches
   function countPropertyMatches(pet: Pet, selectedProps: string[]): number {
-    return getMatchingProperties(pet, selectedProps).length
+    const petProperties = pet.properties || mapTemperamentToProperties(pet.temperament)
+    return selectedProps.filter(prop => petProperties.includes(prop)).length
+  }
+
+  // ✅ NORMALISIERTE GRÖSSEN-FUNKTION
+  const normalizeSize = (rawSize: string | null | undefined): string | null => {
+    if (!rawSize || rawSize === undefined || rawSize === null) return null
+    
+    const size = rawSize.toLowerCase()
+    
+    if (size.includes('sehr klein')) return 'Sehr klein'
+    if (size.includes('klein') && !size.includes('mittel') && !size.includes('groß')) return 'Klein'
+    if (size.includes('klein-mittel')) return 'Klein-Mittel'
+    if (size.includes('mittel') && !size.includes('groß') && !size.includes('klein')) return 'Mittel'
+    if (size.includes('mittel-groß')) return 'Mittel-Groß'
+    if (size.includes('groß') && !size.includes('sehr')) return 'Groß'
+    if (size.includes('sehr groß')) return 'Sehr groß'
+    if (size.includes('variabel')) return 'Variabel'
+    
+    // Fallback für cm-Angaben
+    const cmMatch = rawSize.match(/(\d+)[-–](\d+)\s*cm/)
+    if (cmMatch) {
+      const avgSize = (parseInt(cmMatch[1]) + parseInt(cmMatch[2])) / 2
+      if (avgSize <= 23) return 'Sehr klein'
+      if (avgSize <= 40) return 'Klein'
+      if (avgSize <= 50) return 'Klein-Mittel'
+      if (avgSize <= 60) return 'Mittel'
+      if (avgSize <= 70) return 'Mittel-Groß'
+      if (avgSize <= 80) return 'Groß'
+      return 'Sehr groß'
+    }
+    
+    return rawSize
+  }
+
+  // ✅ HELPER FUNCTIONS FÜR SICHERE SORTIERUNG
+  const parseLifespan = (lifespan: string | null | undefined): number => {
+    if (!lifespan) return 0
+    const match = lifespan.match(/(\d+)/)
+    return match ? parseInt(match[1]) : 0
+  }
+
+  const getSizeOrder = (size: string | null): number => {
+    const sizeOrder: Record<string, number> = {
+      'Sehr klein': 1,
+      'Klein': 2,
+      'Klein-Mittel': 3,
+      'Mittel': 4,
+      'Mittel-Groß': 5,
+      'Groß': 6,
+      'Sehr groß': 7,
+      'Variabel': 8
+    }
+    return sizeOrder[size || ''] || 999
   }
 
   const filteredAndSortedPets = useMemo(() => {
+    // ✅ DEBUG: Log initial count
+    console.log(`🔍 Starting with ${pets.length} pets`)
+    
     let filtered = pets.filter(pet => {
-      // Search filter
-      if (filters.search) {
+      // ✅ KORRIGIERT: Search filter - NUR wenn aktiv
+      if (filters.search && filters.search.trim().length > 0) {
         const searchLower = filters.search.toLowerCase()
         const matchesName = pet.name.toLowerCase().includes(searchLower)
         const matchesBreed = pet.breed?.toLowerCase().includes(searchLower)
         const matchesTemperament = pet.temperament?.some(trait => 
           trait.toLowerCase().includes(searchLower)
         )
+        
         if (!matchesName && !matchesBreed && !matchesTemperament) {
           return false
         }
       }
 
-      // Size filter
-      if (filters.size.length > 0 && pet.size) {
-        if (!filters.size.includes(pet.size)) return false
+      // ✅ KORRIGIERT: Size filter - NUR wenn Filter aktiv UND Pet hat Größe
+      if (filters.size.length > 0) {
+        if (pet.size) {
+          const normalizedSize = normalizeSize(pet.size)
+          if (normalizedSize && !filters.size.includes(normalizedSize)) {
+            return false
+          }
+        }
+        // ✅ WICHTIG: Pets OHNE Größe werden NICHT ausgefiltert!
       }
 
-      // Care level filter
-      if (filters.careLevel.length > 0 && pet.careLevel) {
-        if (!filters.careLevel.includes(pet.careLevel)) return false
+      // ✅ KORRIGIERT: Care level filter - NUR wenn Filter aktiv UND Pet hat careLevel
+      if (filters.careLevel.length > 0) {
+        if (pet.careLevel && !filters.careLevel.includes(pet.careLevel)) {
+          return false
+        }
+        // ✅ WICHTIG: Pets OHNE careLevel werden NICHT ausgefiltert!
       }
 
-      // Temperament filter
-      if (filters.temperament.length > 0 && pet.temperament) {
-        const hasMatchingTrait = filters.temperament.some(trait =>
-          pet.temperament?.includes(trait)
-        )
-        if (!hasMatchingTrait) return false
+      // ✅ KORRIGIERT: Temperament filter - NUR wenn Filter aktiv UND Pet hat temperament
+      if (filters.temperament.length > 0) {
+        if (pet.temperament && pet.temperament.length > 0) {
+          const hasMatchingTrait = filters.temperament.some(trait => 
+            pet.temperament?.includes(trait)
+          )
+          if (!hasMatchingTrait) return false
+        }
+        // ✅ WICHTIG: Pets OHNE temperament werden NICHT ausgefiltert!
       }
 
-      // Properties filter
+      // Properties filter - nur wenn aktiv
       if (selectedProperties.length > 0) {
         const petProperties = pet.properties || mapTemperamentToProperties(pet.temperament)
-        const hasMatchingProperties = selectedProperties.some(propId =>
+        const hasMatchingProperties = selectedProperties.some(propId => 
           petProperties.includes(propId)
         )
         if (!hasMatchingProperties) return false
@@ -110,7 +175,10 @@ export default function FilteredPetGrid({ pets }: FilteredPetGridProps) {
       return true
     })
 
-    // Sorting
+    // ✅ DEBUG: Log after filtering
+    console.log(`🔍 After filtering: ${filtered.length} pets`)
+
+    // ✅ SORTIERUNG
     filtered.sort((a, b) => {
       let comparison = 0
 
@@ -118,24 +186,33 @@ export default function FilteredPetGrid({ pets }: FilteredPetGridProps) {
         case 'name':
           comparison = a.name.localeCompare(b.name)
           break
+          
+        case 'breed':
+          const breedA = a.breed || 'Unbekannt'
+          const breedB = b.breed || 'Unbekannt'
+          comparison = breedA.localeCompare(breedB)
+          break
+          
+        case 'origin':
+          const originA = a.origin || 'Unbekannt'
+          const originB = b.origin || 'Unbekannt'
+          comparison = originA.localeCompare(originB)
+          break
+          
+        case 'lifespan':
+          comparison = parseLifespan(a.lifeExpectancy) - parseLifespan(b.lifeExpectancy)
+          break
+          
         case 'size':
-          const sizeOrder = { 'Klein': 1, 'Mittel': 2, 'Groß': 3, 'Sehr groß': 4 }
-          const aSize = sizeOrder[a.size as keyof typeof sizeOrder] || 0
-          const bSize = sizeOrder[b.size as keyof typeof sizeOrder] || 0
-          comparison = aSize - bSize
+          comparison = getSizeOrder(normalizeSize(a.size)) - getSizeOrder(normalizeSize(b.size))
           break
-        case 'care':
-          const careOrder = { 'Niedrig': 1, 'Mittel': 2, 'Hoch': 3, 'Anspruchsvoll': 4 }
-          const aCare = careOrder[a.careLevel as keyof typeof careOrder] || 0
-          const bCare = careOrder[b.careLevel as keyof typeof careOrder] || 0
-          comparison = aCare - bCare
-          break
+          
         case 'properties':
-          // Sort by property match count
           const aMatches = countPropertyMatches(a, selectedProperties)
           const bMatches = countPropertyMatches(b, selectedProperties)
           comparison = bMatches - aMatches
           break
+          
         default:
           comparison = 0
       }
@@ -143,6 +220,7 @@ export default function FilteredPetGrid({ pets }: FilteredPetGridProps) {
       return filters.sortOrder === 'asc' ? comparison : -comparison
     })
 
+    console.log(`🔍 Final result: ${filtered.length} pets displayed`)
     return filtered
   }, [pets, filters, selectedProperties])
 
@@ -154,17 +232,24 @@ export default function FilteredPetGrid({ pets }: FilteredPetGridProps) {
   if (filteredAndSortedPets.length === 0) {
     return (
       <div className="col-span-full">
-        <div className="card bg-base-100 shadow-lg">
-          <div className="card-body text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold mb-2">Keine passenden Hunde gefunden</h3>
-            <p className="text-base-content/70 mb-4">
-              Versuche andere Eigenschaften oder entferne einige Filter.
+        <div className="card bg-base-100 shadow-lg border border-base-300">
+          <div className="card-body text-center py-16">
+            <div className="w-20 h-20 bg-base-300 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="w-10 h-10 text-base-content/50" />
+            </div>
+            
+            <h3 className="text-xl font-bold mb-4">Keine Rassen gefunden</h3>
+            
+            <p className="text-base-content/70 mb-6 max-w-md mx-auto">
+              Versuche andere Filter oder entferne einige Einstellungen.
             </p>
+            
             {selectedProperties.length > 0 && (
-              <p className="text-sm text-base-content/50">
-                Aktuell ausgewählt: {selectedProperties.length} Eigenschaften
-              </p>
+              <div className="bg-info/10 rounded-lg p-4 max-w-md mx-auto">
+                <div className="text-sm text-info">
+                  Aktuell ausgewählt: <span className="font-semibold">{selectedProperties.length}</span> Eigenschaften
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -174,18 +259,13 @@ export default function FilteredPetGrid({ pets }: FilteredPetGridProps) {
 
   return (
     <>
-      {filteredAndSortedPets.map((pet) => {
-        const matchingProperties = getMatchingProperties(pet, selectedProperties)
-        
-        return (
-          <PetCard 
-            key={pet.id} 
-            pet={pet} 
-            showPropertyMatch={selectedProperties.length > 0}  // ✅ Korrekte Prop
-            matchingProperties={matchingProperties}  // ✅ Passende Properties übergeben
-          />
-        )
-      })}
+      {filteredAndSortedPets.map((pet) => (
+        <PetCard
+          key={pet.id}
+          pet={pet}
+          showPropertyMatch={countPropertyMatches(pet, selectedProperties) > 0}
+        />
+      ))}
     </>
   )
 }

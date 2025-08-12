@@ -308,7 +308,9 @@ function EmptyState({ species }: { species: string }) {
 
 async function CategoryPets({ species }: { species: string }) {
   const rawPets = await prisma.pet.findMany({
-    where: { species },
+    where: {
+        species: species
+      },
     orderBy: { name: 'asc' },
     select: {
       id: true,
@@ -526,35 +528,25 @@ export default async function SpeciesPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen">
-      {/* Kompakte Breadcrumb Navigation */}
-      <nav className="bg-base-100/95 backdrop-blur-sm border-b border-base-300 sticky top-16 z-40">
-        <div className="container mx-auto px-4 py-3">
-          <div className="breadcrumbs text-sm">
-            <ul className="flex items-center gap-2">
-              <li>
-                <Link href="/" className="flex items-center gap-1 hover:text-primary transition-colors">
-                  <Home className="w-4 h-4" />
-                  Home
-                </Link>
-              </li>
-              <ChevronRight className="w-4 h-4 text-base-content/50" />
-              <li className="text-base-content/60">{category.name}</li>
-            </ul>
+      <nav className="bg-base-100/95 backdrop-blur-sm border-b border-base-300 sticky top-6 z-40">
+        <div className="container mx-auto px-4">
+          <div className="h-6 flex items-center">
+            <div className="breadcrumbs text-sm">
+              <ul className="flex items-center gap-2">
+                <li>
+                  <Link href="/" className="flex items-center gap-1 hover:text-primary transition-colors">
+                    <Home className="w-4 h-4" />
+                    Home
+                  </Link>
+                </li>
+                <ChevronRight className="w-4 h-4 text-base-content/50" />
+                <li className="text-base-content/60">{category.name}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Kompakter Back Button */}
-      <div className="container mx-auto px-4 py-4">
-        <Link 
-          href="/" 
-          className="btn btn-ghost btn-sm gap-2 hover:bg-primary/10 transition-all duration-300 rounded-lg"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Zurück zur Übersicht
-        </Link>
-      </div>
-      
       {/* Kompakter Hero Section */}
       <CompactHeroSection 
         category={category} 

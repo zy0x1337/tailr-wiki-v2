@@ -8,9 +8,19 @@ interface FilterState {
   size: string[]
   careLevel: string[]
   temperament: string[]
-  properties: string[]  // ✅ NEU: Properties hinzugefügt
-  sortBy: 'name' | 'size' | 'care' | 'rating' | 'properties'  // ✅ Properties als Sort-Option
+  properties: string[]
+  sortBy: 'name' | 'size' | 'breed' | 'origin' | 'lifespan' | 'properties'
   sortOrder: 'asc' | 'desc'
+}
+
+const initialFilters: FilterState = {
+  search: '',
+  size: [],
+  careLevel: [],
+  temperament: [],
+  properties: [],
+  sortBy: 'name',
+  sortOrder: 'asc'
 }
 
 interface FilterContextType {
