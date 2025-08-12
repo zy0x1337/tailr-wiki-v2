@@ -1,36 +1,174 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TAILR.WIKI - Personal Development Notes
 
-## Getting Started
+> SQLite-basierte Haustier-Platform mit Next.js 15 + React 19
 
-First, run the development server:
+## Quick Start
 
-```bash
+Development starten
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Database Schema pushen
+npx prisma db push
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Prisma Studio öffnen
+npx prisma studio
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+text
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 15.4.6** + **React 19.1.0** + **TypeScript 5.9.2**
+- **SQLite** mit **Prisma 6.13.0**
+- **daisyUI 5.0.50** + **Tailwind CSS**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+app/
+├── layout.tsx # Root Layout + Navigation
+├── page.tsx # Homepage
+├── blog/[slug]/page.tsx # Blog Posts
+├── [species]/page.tsx # Category Pages
+└── components/
+├── ui/ # Navigation, CategoryImage, ThemeToggle
+└── providers/ # Context Providers
 
-## Deploy on Vercel
+prisma/
+├── schema.prisma # SQLite Schema
+├── dev.db # Database File
+└── seed.ts # Seed Data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+text
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Database Models
+
+model Category {
+id String @id // "dogs", "cats"
+name String // "Hunde", "Katzen"
+speciesCount Int
+pets Pet[]
+}
+
+model Pet {
+id Int @id @default(autoincrement())
+name String
+slug String @unique
+species String
+category Category @relation(fields: [species], references: [id])
+
+// JSON Strings für flexible Daten
+temperament String? // ["Intelligent", "Loyal"]
+ratings String? // Complex rating object
+gallery String? // Image URLs array
+}
+
+model BlogPost {
+id Int @id @default(autoincrement())
+title String
+slug String @unique
+content String
+author String // JSON object
+}
+
+text
+
+## Development Commands
+
+Database
+npx prisma db push # Schema zu DB
+npx prisma studio # DB GUI
+npx prisma migrate reset # Reset DB
+
+Development
+npm run dev # Dev server
+npm run build # Production build
+npm run type-check # TypeScript check
+
+Analysis
+npm run analyze # Bundle analysis
+npm run lighthouse # Performance audit
+
+text
+
+## Environment Variables
+
+.env.local
+DATABASE_URL="file:./prisma/dev.db"
+NEXTAUTH_SECRET="your-secret"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+text
+
+## Performance Targets
+
+- **Lighthouse**: 95+
+- **FCP**: <1s (aktuell: 0.4s)  
+- **LCP**: <2s (aktuell: 0.8s)
+- **Bundle**: ~300KB
+
+## Key Components
+
+### Navigation System
+- Burger-Menü mit `navigationItems` Array
+- `isMenuOpen` State Management
+- Theme Toggle Integration
+
+### Category Cards  
+- `CategoryImage` Component mit WebP-First
+- Responsive Skalierung über `category-image-container`
+- Zoom-Effekte bei Hover
+
+### Blog System
+- Individual Posts mit SEO-Metadata
+- Author JSON Parsing Pattern
+- Related Posts Logic
+
+## JSON Parsing Patterns
+
+// Sicheres JSON Parsing für SQLite Strings
+function parseRatings(ratingsJson: string | null): PetRatings | null {
+if (!ratingsJson) return null;
+try {
+return JSON.parse(ratingsJson) as PetRatings;
+} catch {
+return null;
+}
+}
+
+function parseTemperament(temperamentJson: string | null): string[] {
+if (!temperamentJson) return [];
+try {
+return JSON.parse(temperamentJson) as string[];
+} catch {
+return [];
+}
+}
+
+text
+
+## CSS Architecture
+
+/* Etablierte Klassen in globals.css */
+.category-card # Card Container
+.category-image-container # Image Wrapper
+.category-image-enhanced # Enhanced Styling
+
+text
+
+## Development Notes
+
+### Code Standards
+- **TypeScript Strict**: 100% Coverage, keine `any` types
+- **Server Components**: Default, Client nur bei User Interaction  
+- **WebP-First**: Echte Bilder über Emojis bevorzugt
+- **daisyUI Components**: Minimales Custom CSS
+
+### Database Notes
+- SQLite für Development & Production geeignet
+- JSON-String-Felder für flexible Strukturen
+- Prisma Auto-Migration mit `db push`
+- Backup via einfaches Datei-Copy von `dev.db`
+
+### Deployment Notes
+- Vercel unterstützt SQLite Edge Runtime
+- Für größere Loads: Migration zu PostgreSQL möglich
+- File-based DB = einfache Backups
