@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ CSS Variables für bessere Performance - KORRIGIERT */
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  
+  /* ✅ KORRIGIERTE Custom Properties - daisyUI CSS Variables verwenden */
+  --hero-gradient: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Scroll Behavior */
+  --scroll-offset: 80px;
+}
+
+/* ✅ Base Layer - Performance-optimierte Grundlagen */
+@layer base {
+  /* Smooth Scrolling */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--scroll-offset);
+  }
+
+  /* Font Optimization */
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ✅ Accessibility Focus States */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-blue-500;
+  }
+
+  /* daisyUI-kompatible Focus States für interaktive Elemente */
+  .btn:focus-visible,
+  .card:focus-visible,
+  .link:focus-visible {
+    @apply outline-2 outline-offset-2;
+    outline-color: hsl(var(--p));
+  }
+
+  /* Form Elements Styling */
+  input, textarea, select {
+    @apply transition-colors duration-200;
+  }
+
+  input:focus-visible, 
+  textarea:focus-visible, 
+  select:focus-visible {
+    @apply outline-2 outline-offset-2;
+    outline-color: hsl(var(--p));
+  }
+
+  /* Image Performance */
+  img {
+    @apply max-w-full h-auto;
+  }
+
+  /* Link Performance */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  a:focus-visible {
+    @apply outline-2 outline-offset-2;
+    outline-color: hsl(var(--p));
+  }
+}
+
+/* ✅ Components Layer - daisyUI Extensions */
+@layer components {
+  /* Hero Section Enhancements */
+  .hero-gradient {
+    background: linear-gradient(135deg, 
+      hsl(var(--p)) 0%, 
+      hsl(var(--s)) 100%
+    );
+  }
+
+  /* ✅ KORRIGIERTE Text Gradient - daisyUI Utilities verwenden */
+  .hero-text-gradient {
+    @apply text-primary;
+    background: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Card Enhancements */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+    box-shadow: var(--card-shadow);
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-2;
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  /* Species Card Gradients */
+  .species-card-dogs {
+    @apply bg-gradient-to-br from-amber-50 to-orange-50;
+  }
+
+  .species-card-cats {
+    @apply bg-gradient-to-br from-purple-50 to-pink-50;
+  }
+
+  .species-card-fish {
+    @apply bg-gradient-to-br from-blue-50 to-cyan-50;
+  }
+
+  .species-card-rodents {
+    @apply bg-gradient-to-br from-green-50 to-emerald-50;
+  }
+
+  .species-card-birds {
+    @apply bg-gradient-to-br from-yellow-50 to-amber-50;
+  }
+
+  .species-card-reptiles {
+    @apply bg-gradient-to-br from-red-50 to-rose-50;
+  }
+
+  /* Button Enhancements */
+  .btn-modern {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .btn-modern::before {
+    content: '';
+    @apply absolute inset-0 bg-white/20 translate-x-[-100%] skew-x-12 transition-transform duration-700;
+  }
+
+  .btn-modern:hover::before {
+    @apply translate-x-[100%];
+  }
+
+  /* Loading States */
+  .loading-page {
+    @apply flex items-center justify-center min-h-screen;
+  }
+
+  /* Navigation Enhancements */
+  .nav-link {
+    @apply relative transition-colors duration-200;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background-color: hsl(var(--p));
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    @apply w-full;
+  }
+
+  /* Typography Enhancements */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Container Improvements */
+  .container-narrow {
+    @apply max-w-4xl mx-auto px-4;
+  }
+
+  .container-wide {
+    @apply max-w-7xl mx-auto px-4;
+  }
+
+  /* Section Spacing */
+  .section-padding {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+
+  .section-padding-sm {
+    @apply py-8 md:py-12 lg:py-16;
+  }
+
+  /* ✅ Custom Outline Utilities */
+  .outline-primary {
+    outline: 2px solid hsl(var(--p));
+    outline-offset: 2px;
+  }
+
+  .outline-secondary {
+    outline: 2px solid hsl(var(--s));
+    outline-offset: 2px;
+  }
+}
+
+/* ✅ Utilities Layer - Performance Utilities */
+@layer utilities {
+  /* GPU Acceleration für Animationen */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Backdrop Filters */
+  .backdrop-blur-safari {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Custom Shadows */
+  .shadow-soft {
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-medium {
+    box-shadow: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-strong {
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 20px 50px -10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* ✅ KORRIGIERTE Text Utilities - daisyUI kompatibel */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Responsive Text Sizing */
+  .text-responsive-xl {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  /* Safe Area für Mobile */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Performance Optimizations */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  /* Print Styles */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+  }
+}
+
+/* ✅ Dark Mode Improvements */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ✅ Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ✅ Performance Critical CSS - Above the Fold */
+.hero-critical {
+  min-height: 100vh;
+  background: linear-gradient(135deg, hsl(var(--p)) 0%, hsl(var(--s)) 100%);
+}

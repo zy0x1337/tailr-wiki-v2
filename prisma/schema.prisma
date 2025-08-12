@@ -1,0 +1,79 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id           String @id // "dogs", "cats", etc.
+  name         String // "Hunde", "Katzen"
+  speciesCount Int
+  image        String?
+  description  String
+  pets         Pet[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Pet {
+  id              Int      @id @default(autoincrement())
+  name            String
+  slug            String   @unique
+  breed           String?
+  species         String   // "dogs", "cats"
+  category        Category @relation(fields: [species], references: [id])
+  subcategory     String?
+  
+  // Basis-Infos
+  description     String
+  origin          String?
+  size            String?
+  weight          String?
+  lifeExpectancy  String?
+  careLevel       String?
+  
+  // Bilder
+  primaryImage    String?
+  gallery         String?  // JSON Array als String
+  
+  // Temperament als String Array (JSON)
+  temperament     String?  // JSON: ["Intelligent", "Loyal"]
+  
+  // Details als JSON String
+  summary         String?
+  character       String?
+  health          String?
+  grooming        String?
+  activity        String?
+  suitability     String?
+  
+  // Ratings als JSON String
+  ratings         String?  // Complex rating object
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  category    String
+  content     String   // Full HTML content
+  excerpt     String?
+  
+  // Author als JSON String
+  author      String   // JSON: {"name": "...", "avatar": "..."}
+  
+  readingTime String?
+  cardImage   String?
+  heroImage   String?
+  
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
