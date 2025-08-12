@@ -1,15 +1,52 @@
-// app/[species]/page.tsx - Korrigiert mit deiner FilterSidebar
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { ArrowLeft, Sparkles, TrendingUp, Filter } from 'lucide-react'
+import Image from 'next/image'
+import { 
+  ArrowLeft, 
+  TrendingUp, 
+  Grid3X3, 
+  MapPin,
+  Heart,
+  Activity,
+  Award,
+  Users,
+  ChevronDown,
+  Eye,
+  Home,
+  ChevronRight,
+  Settings
+} from 'lucide-react'
 import { FilterProvider } from '@/components/providers/FilterProvider'
 import { PetPropertiesProvider } from '@/components/providers/PetPropertiesProvider'
-import FilterSidebar from '@/components/ui/FilterSidebar'  // ✅ KORRIGIERT: Deine bestehende Komponente
 import PropertiesFilter from '@/components/ui/PropertiesFilter'
 import FilteredPetGrid from '@/components/ui/FilteredPetGrid'
+import FilterSidebar from '@/components/ui/FilterSidebar'
+
+// ✅ Enhanced Type Definitions
+interface PetWithParsedData {
+  id: number
+  name: string
+  breed: string | null
+  slug: string
+  species: string
+  primaryImage: string | null
+  description: string
+  size: string | null
+  temperament: string[] | null
+  careLevel: string | null
+  ratings: Record<string, number> | null
+  origin: string | null
+  lifeExpectancy: string | null
+  weight: string | null
+  createdAt: Date
+}
+
+interface PageProps {
+  params: Promise<{ species: string }>
+}
 
 // ✅ Type-safe JSON parsing
 function parseJsonField<T>(field: string | null): T | null {
@@ -23,50 +60,53 @@ function parseJsonField<T>(field: string | null): T | null {
 
 const validSpecies = ['dogs', 'cats', 'birds', 'fish', 'rodents', 'reptiles']
 
-// ✅ Species display configuration
+// ✅ Kompakte Species Configuration
 const speciesConfig = {
   dogs: { 
     name: 'Hunde', 
-    emoji: '🐕', 
-    color: 'from-blue-500 to-purple-600',
-    description: 'Treue Begleiter für jede Lebenssituation'
+    color: 'from-blue-500 via-indigo-500 to-purple-600',
+    bgPattern: 'from-blue-50 to-indigo-50',
+    description: 'Treue Begleiter für jede Lebenssituation',
+    heroImage: '/images/categories/dogs-hero.webp'
   },
   cats: { 
     name: 'Katzen', 
-    emoji: '🐱', 
-    color: 'from-pink-500 to-orange-500',
-    description: 'Elegante und unabhängige Samtpfoten'
+    color: 'from-pink-500 via-rose-500 to-orange-500',
+    bgPattern: 'from-pink-50 to-rose-50',
+    description: 'Elegante und unabhängige Samtpfoten',
+    heroImage: '/images/categories/cats-hero.webp'
   },
   birds: { 
     name: 'Vögel', 
-    emoji: '🦅', 
-    color: 'from-green-500 to-teal-500',
-    description: 'Farbenfrohe und intelligente Gefährten'
+    color: 'from-green-500 via-emerald-500 to-teal-500',
+    bgPattern: 'from-green-50 to-emerald-50',
+    description: 'Farbenfrohe und intelligente Gefährten',
+    heroImage: '/images/categories/birds-hero.webp'
   },
   fish: { 
     name: 'Fische', 
-    emoji: '🐠', 
-    color: 'from-cyan-500 to-blue-500',
-    description: 'Friedliche Unterwasserwelt für Zuhause'
+    color: 'from-cyan-500 via-blue-500 to-indigo-500',
+    bgPattern: 'from-cyan-50 to-blue-50',
+    description: 'Friedliche Unterwasserwelt für Zuhause',
+    heroImage: '/images/categories/fish-hero.webp'
   },
   rodents: { 
     name: 'Kleintiere', 
-    emoji: '🐹', 
-    color: 'from-yellow-500 to-red-500',
-    description: 'Kleine Freunde mit großer Persönlichkeit'
+    color: 'from-yellow-500 via-amber-500 to-orange-500',
+    bgPattern: 'from-yellow-50 to-amber-50',
+    description: 'Kleine Freunde mit großer Persönlichkeit',
+    heroImage: '/images/categories/rodents-hero.webp'
   },
   reptiles: { 
     name: 'Reptilien', 
-    emoji: '🦎', 
-    color: 'from-emerald-500 to-green-600',
-    description: 'Faszinierende exotische Begleiter'
+    color: 'from-emerald-500 via-green-600 to-lime-500',
+    bgPattern: 'from-emerald-50 to-green-50',
+    description: 'Faszinierende exotische Begleiter',
+    heroImage: '/images/categories/reptiles-hero.webp'
   }
 }
 
-interface PageProps {
-  params: Promise<{ species: string }>
-}
-
+// ✅ Enhanced Metadata Generation
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params
   
@@ -96,14 +136,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${category.name} Ratgeber | tailr.wiki`,
       description: config?.description || category.description,
       type: 'website',
-      images: [
-        {
-          url: category.image || '/images/default-category.jpg',
-          width: 1200,
-          height: 630,
-          alt: `${category.name} Übersicht`
-        }
-      ]
+      images: [{
+        url: config?.heroImage || category.image || '/images/default-category.jpg',
+        width: 1200,
+        height: 630,
+        alt: `${category.name} Übersicht`
+      }]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${category.name} Ratgeber | tailr.wiki`,
+      description: config?.description || category.description,
+      images: [config?.heroImage || category.image || '/images/default-category.jpg']
     }
   }
 }
@@ -114,7 +158,154 @@ export async function generateStaticParams() {
   }))
 }
 
-// ✅ Optimized pets loading
+// ✅ Kompakter Hero Section
+function CompactHeroSection({ 
+  category, 
+  config, 
+  petCount 
+}: { 
+  category: { name: string; description: string; image: string | null }, 
+  config: typeof speciesConfig[keyof typeof speciesConfig],
+  petCount: number 
+}) {
+  return (
+    <section className="relative py-12 overflow-hidden">
+      {/* Subtiler Background Pattern */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${config?.bgPattern || 'from-base-100 to-base-200'} opacity-40`}></div>
+      <div className={`absolute inset-0 bg-gradient-to-r ${config?.color || 'from-primary to-secondary'} opacity-5`}></div>
+      
+      {/* Dezente Decorative Shapes */}
+      <div className="absolute top-6 right-8 w-20 h-20 bg-primary/5 rounded-full blur-2xl"></div>
+      <div className="absolute bottom-6 left-12 w-24 h-24 bg-secondary/5 rounded-full blur-3xl"></div>
+      
+      <div className="relative container mx-auto px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Kompakter Titel */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+            <span className={`bg-gradient-to-r ${config?.color || 'from-primary to-secondary'} bg-clip-text text-transparent`}>
+              {category.name}
+            </span>
+          </h1>
+          
+          {/* Kompakte Statistics Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+            <div className="badge badge-primary badge-md px-3 py-2 text-sm font-semibold gap-2">
+              <TrendingUp className="w-4 h-4" />
+              {petCount} Rassen
+            </div>
+            <div className="badge badge-secondary badge-md px-3 py-2 text-sm font-semibold gap-2">
+              <Award className="w-4 h-4" />
+              Vollständige Profile
+            </div>
+            <div className="badge badge-accent badge-md px-3 py-2 text-sm font-semibold gap-2">
+              <Heart className="w-4 h-4" />
+              Expertenwissen
+            </div>
+          </div>
+          
+          {/* Kompakte Description */}
+          <p className="text-base sm:text-lg text-base-content/80 max-w-2xl mx-auto leading-relaxed">
+            {config?.description || category.description}
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ✅ Kompakte Statistics Section
+function CompactStatisticsSection({ pets }: { pets: PetWithParsedData[] }) {
+  const stats = [
+    {
+      label: 'Rassen',
+      value: pets.length,
+      icon: <Grid3X3 className="w-4 h-4" />,
+      color: 'text-primary',
+      bgColor: 'bg-primary/10'
+    },
+    {
+      label: 'Größen',
+      value: new Set(pets.map(p => p.size).filter(Boolean)).size,
+      icon: <Activity className="w-4 h-4" />,
+      color: 'text-secondary',
+      bgColor: 'bg-secondary/10'
+    },
+    {
+      label: 'Pflegestufen',
+      value: new Set(pets.map(p => p.careLevel).filter(Boolean)).size,
+      icon: <Heart className="w-4 h-4" />,
+      color: 'text-accent',
+      bgColor: 'bg-accent/10'
+    },
+    {
+      label: 'Länder',
+      value: new Set(pets.map(p => p.origin).filter(Boolean)).size,
+      icon: <MapPin className="w-4 h-4" />,
+      color: 'text-info',
+      bgColor: 'bg-info/10'
+    }
+  ]
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      {stats.map((stat, index) => (
+        <div
+          key={stat.label}
+          className="card bg-base-100 shadow-lg border border-base-300 hover:shadow-xl transition-all duration-300 group"
+        >
+          <div className="card-body items-center text-center p-4">
+            <div className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300`}>
+              <div className={stat.color}>
+                {stat.icon}
+              </div>
+            </div>
+            <div className="text-xl font-bold mb-1 text-base-content group-hover:text-primary transition-colors">
+              {stat.value}
+            </div>
+            <div className="text-xs font-medium text-base-content/70 uppercase tracking-wide">
+              {stat.label}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ✅ Empty State Component
+function EmptyState({ species }: { species: string }) {
+  const config = speciesConfig[species as keyof typeof speciesConfig]
+  
+  return (
+    <div className="min-h-[40vh] flex items-center justify-center">
+      <div className="card bg-base-100 shadow-xl border border-base-300 max-w-lg mx-auto">
+        <div className="card-body text-center py-12 px-8">
+          <div className="w-20 h-20 bg-base-300 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Eye className="w-10 h-10 text-base-content/50" />
+          </div>
+          <h3 className="text-2xl font-bold mb-4 text-base-content">
+            Noch keine {config?.name} verfügbar
+          </h3>
+          <p className="text-base-content/70 mb-8 leading-relaxed">
+            Wir arbeiten daran, diese Kategorie mit detaillierten Profilen zu füllen. 
+            Schaue bald wieder vorbei oder entdecke andere Kategorien!
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/" className="btn btn-primary gap-2">
+              <Home className="w-4 h-4" />
+              Zur Startseite
+            </Link>
+            <Link href="/dogs" className="btn btn-outline gap-2">
+              <Eye className="w-4 h-4" />
+              Hunde entdecken
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 async function CategoryPets({ species }: { species: string }) {
   const rawPets = await prisma.pet.findMany({
     where: { species },
@@ -138,102 +329,104 @@ async function CategoryPets({ species }: { species: string }) {
     }
   })
 
-  const pets = rawPets.map(pet => ({
+  const pets: PetWithParsedData[] = rawPets.map(pet => ({
     ...pet,
     temperament: parseJsonField<string[]>(pet.temperament),
-    ratings: parseJsonField(pet.ratings)
+    ratings: parseJsonField<Record<string, number>>(pet.ratings)
   }))
 
   if (pets.length === 0) {
-    const config = speciesConfig[species as keyof typeof speciesConfig]
-    
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="card bg-base-100 shadow-xl border border-base-300 max-w-md mx-auto">
-          <div className="card-body text-center py-12">
-            <div className="text-8xl mb-6 animate-bounce">
-              {config?.emoji || '🐾'}
-            </div>
-            <h3 className="text-2xl font-bold mb-3 text-base-content">
-              Noch keine {config?.name} verfügbar
-            </h3>
-            <p className="text-base-content/70 mb-6 leading-relaxed">
-              Wir arbeiten daran, diese Kategorie mit detaillierten Profilen zu füllen. 
-              Schaue bald wieder vorbei!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/" className="btn btn-primary gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Zurück zur Startseite
-              </Link>
-              <Link href="/dogs" className="btn btn-outline gap-2">
-                <Sparkles className="w-4 h-4" />
-                Hunde entdecken
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <EmptyState species={species} />
   }
 
-  // ✅ LAYOUT MIT SIDEBAR (wie ursprünglich geplant)
   return (
     <FilterProvider>
       <PetPropertiesProvider>
-        <div className="grid lg:grid-cols-4 xl:grid-cols-5 gap-8">
-          {/* Filter Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="space-y-6">
-              {/* Deine bestehende FilterSidebar */}
+        <div className="space-y-6">
+          {/* Kompakte Statistics Section */}
+          <CompactStatisticsSection pets={pets} />
+          
+          <div className="space-y-6">
+            {/* Haupt-Filter-Leiste - Prominent oben */}
+            <div className="bg-base-100 rounded-xl shadow-lg border border-base-300 p-4">
               <FilterSidebar pets={pets} />
-              
-              {/* Properties Filter - nur für Hunde */}
+            </div>
+            
+            {/* Content Layout */}
+            <div className="grid lg:grid-cols-5 gap-6">
+              {/* Erweiterte Filter - Nur für Hunde, in Sidebar */}
               {species === 'dogs' && (
-                <PropertiesFilter />
+                <div className="lg:col-span-1">
+                  <div className="card bg-base-100 shadow-lg border border-base-300 rounded-xl overflow-hidden sticky top-20">
+                    <div className="card-header bg-gradient-to-r from-accent/5 to-info/5 p-4 border-b border-base-300">
+                      <h3 className="font-semibold text-base flex items-center gap-2">
+                        <Settings className="w-4 h-4 text-accent" />
+                        Erweiterte Filter
+                      </h3>
+                    </div>
+                    <div className="card-body p-4">
+                      <PropertiesFilter />
+                    </div>
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
 
-          {/* Content Area */}
-          <div className="lg:col-span-3 xl:col-span-4">
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="card bg-base-100 shadow-lg border border-base-300">
-                <div className="card-body p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">{pets.length}</div>
-                  <div className="text-xs text-base-content/70">Rassen</div>
-                </div>
-              </div>
-              <div className="card bg-base-100 shadow-lg border border-base-300">
-                <div className="card-body p-4 text-center">
-                  <div className="text-2xl font-bold text-secondary">
-                    {new Set(pets.map(p => p.size).filter(Boolean)).size}
+              {/* Pet Grid - Responsive basierend auf Sidebar */}
+              <div className={species === 'dogs' ? 'lg:col-span-4' : 'lg:col-span-5'}>
+                <div className="space-y-6">
+                  {/* Pet Grid */}
+                  <div className={`grid gap-6 ${
+                    species === 'dogs' 
+                      ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+                  }`}>
+                    <FilteredPetGrid pets={pets} />
                   </div>
-                  <div className="text-xs text-base-content/70">Größen</div>
-                </div>
-              </div>
-              <div className="card bg-base-100 shadow-lg border border-base-300">
-                <div className="card-body p-4 text-center">
-                  <div className="text-2xl font-bold text-accent">
-                    {new Set(pets.map(p => p.careLevel).filter(Boolean)).size}
+                  
+                  {/* Kompakte Popular Breeds Section */}
+                  <div className="card bg-gradient-to-r from-base-100 to-base-200 shadow-lg border border-base-300 rounded-xl p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      Beliebte Rassen
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                      {pets.slice(0, 12).map((pet) => (
+                        <Link
+                          key={pet.id}
+                          href={`/${pet.species}/${pet.slug}`}
+                          className="group flex items-center gap-2 p-3 rounded-lg hover:bg-base-100 transition-colors"
+                        >
+                          <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                            {pet.primaryImage ? (
+                              <Image
+                                src={pet.primaryImage.startsWith('/') ? pet.primaryImage : `/${pet.primaryImage}`}
+                                alt={pet.name}
+                                width={32}
+                                height={32}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-primary/10 flex items-center justify-center text-xs">
+                                🐾
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-xs truncate group-hover:text-primary transition-colors">
+                              {pet.name}
+                            </div>
+                            {pet.size && (
+                              <div className="text-xs text-base-content/60">
+                                {pet.size}
+                              </div>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="text-xs text-base-content/70">Pflegestufen</div>
                 </div>
               </div>
-              <div className="card bg-base-100 shadow-lg border border-base-300">
-                <div className="card-body p-4 text-center">
-                  <div className="text-2xl font-bold text-info">
-                    {new Set(pets.map(p => p.origin).filter(Boolean)).size}
-                  </div>
-                  <div className="text-xs text-base-content/70">Länder</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Pet Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-              <FilteredPetGrid pets={pets} />
             </div>
           </div>
         </div>
@@ -242,67 +435,73 @@ async function CategoryPets({ species }: { species: string }) {
   )
 }
 
-// ✅ Loading Skeleton für Sidebar-Layout
-function LoadingSkeleton() {
+// ✅ Kompakte Loading Skeleton
+function CompactLoadingSkeleton() {
   return (
-    <div className="grid lg:grid-cols-4 xl:grid-cols-5 gap-8">
-      {/* Sidebar Skeleton */}
-      <div className="lg:col-span-1">
-        <div className="space-y-6">
-          <div className="bg-base-100 rounded-2xl shadow-lg border border-base-300 p-6 animate-pulse">
-            <div className="h-8 bg-base-300 rounded mb-4"></div>
-            <div className="space-y-3">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-4 bg-base-300 rounded"></div>
-              ))}
+    <div className="space-y-6">
+      {/* Stats Skeleton */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="card bg-base-100 shadow-lg animate-pulse">
+            <div className="card-body items-center text-center p-4">
+              <div className="w-10 h-10 bg-base-300 rounded-lg mb-2"></div>
+              <div className="h-5 w-10 bg-base-300 rounded mb-1"></div>
+              <div className="h-3 w-12 bg-base-300 rounded"></div>
             </div>
           </div>
-          <div className="bg-base-100 rounded-2xl shadow-lg border border-base-300 p-6 animate-pulse">
-            <div className="h-6 bg-base-300 rounded mb-4"></div>
-            <div className="space-y-2">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-3 bg-base-300 rounded"></div>
-              ))}
-            </div>
+        ))}
+      </div>
+      
+      {/* Filter Bar Skeleton */}
+      <div className="bg-base-100 rounded-xl shadow-lg p-4">
+        <div className="space-y-4">
+          <div className="h-10 bg-base-300 rounded-lg animate-pulse"></div>
+          <div className="flex gap-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-8 w-20 bg-base-300 rounded animate-pulse"></div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Content Skeleton */}
-      <div className="lg:col-span-3 xl:col-span-4">
-        {/* Stats Skeleton */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="card bg-base-100 shadow-lg animate-pulse">
-              <div className="card-body p-4 text-center">
-                <div className="h-8 bg-base-300 rounded mb-2"></div>
-                <div className="h-3 bg-base-300 rounded"></div>
-              </div>
+      {/* Content Layout Skeleton */}
+      <div className="grid lg:grid-cols-5 gap-6">
+        {/* Sidebar Skeleton - nur ein kleiner Bereich */}
+        <div className="lg:col-span-1">
+          <div className="bg-base-100 rounded-xl shadow-lg p-4 animate-pulse">
+            <div className="h-6 bg-base-300 rounded mb-4"></div>
+            <div className="space-y-2">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-4 bg-base-300 rounded"></div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
 
         {/* Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="card bg-base-100 shadow-lg animate-pulse">
-              <div className="h-48 bg-base-300"></div>
-              <div className="card-body">
-                <div className="h-6 bg-base-300 rounded mb-2"></div>
-                <div className="h-4 bg-base-300 rounded mb-4"></div>
-                <div className="flex gap-2">
-                  <div className="h-6 w-16 bg-base-300 rounded"></div>
-                  <div className="h-6 w-20 bg-base-300 rounded"></div>
+        <div className="lg:col-span-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="card bg-base-100 shadow-lg animate-pulse">
+                <div className="h-40 bg-base-300"></div>
+                <div className="card-body">
+                  <div className="h-5 bg-base-300 rounded mb-2"></div>
+                  <div className="h-3 bg-base-300 rounded mb-4 w-3/4"></div>
+                  <div className="flex gap-2">
+                    <div className="h-5 w-10 bg-base-300 rounded"></div>
+                    <div className="h-5 w-12 bg-base-300 rounded"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
+// ✅ Main Page Component
 export default async function SpeciesPage({ params }: PageProps) {
   const resolvedParams = await params
 
@@ -326,66 +525,85 @@ export default async function SpeciesPage({ params }: PageProps) {
   const config = speciesConfig[resolvedParams.species as keyof typeof speciesConfig]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-300">
-      <div className="container mx-auto px-4 py-8">
-        {/* Enhanced Header */}
-        <div className="mb-8">
-          {/* Breadcrumbs */}
-          <div className="breadcrumbs text-sm mb-6">
-            <ul>
+    <main className="min-h-screen">
+      {/* Kompakte Breadcrumb Navigation */}
+      <nav className="bg-base-100/95 backdrop-blur-sm border-b border-base-300 sticky top-16 z-40">
+        <div className="container mx-auto px-4 py-3">
+          <div className="breadcrumbs text-sm">
+            <ul className="flex items-center gap-2">
               <li>
-                <Link href="/" className="text-primary hover:text-primary-focus">
+                <Link href="/" className="flex items-center gap-1 hover:text-primary transition-colors">
+                  <Home className="w-4 h-4" />
                   Home
                 </Link>
               </li>
-              <li>{category.name}</li>
+              <ChevronRight className="w-4 h-4 text-base-content/50" />
+              <li className="text-base-content/60">{category.name}</li>
             </ul>
           </div>
-
-          {/* Back Button */}
-          <Link 
-            href="/" 
-            className="btn btn-ghost gap-2 mb-6 hover:bg-primary/10 transition-all duration-300"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Zurück zur Übersicht
-          </Link>
-          
-          {/* Hero Section */}
-          <div className="text-center relative">
-            <div className={`absolute inset-0 bg-gradient-to-r ${config?.color || 'from-primary to-secondary'} opacity-5 rounded-3xl`}></div>
-            
-            <div className="relative py-12 px-6">
-              <div className="text-8xl mb-6 animate-bounce">
-                {config?.emoji || '🐾'}
-              </div>
-              
-              <h1 className="text-4xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                {category.name}
-              </h1>
-              
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="badge badge-primary badge-lg gap-2">
-                  <TrendingUp className="w-4 h-4" />
-                  {petCount} Rassen
-                </div>
-                <div className="badge badge-secondary badge-lg">
-                  Vollständige Profile
-                </div>
-              </div>
-              
-              <p className="text-xl text-base-content/80 max-w-3xl mx-auto leading-relaxed">
-                {config?.description || category.description}
-              </p>
-            </div>
-          </div>
         </div>
+      </nav>
 
-        {/* Content */}
-        <Suspense fallback={<LoadingSkeleton />}>
+      {/* Kompakter Back Button */}
+      <div className="container mx-auto px-4 py-4">
+        <Link 
+          href="/" 
+          className="btn btn-ghost btn-sm gap-2 hover:bg-primary/10 transition-all duration-300 rounded-lg"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Zurück zur Übersicht
+        </Link>
+      </div>
+      
+      {/* Kompakter Hero Section */}
+      <CompactHeroSection 
+        category={category} 
+        config={config} 
+        petCount={petCount} 
+      />
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <Suspense fallback={<CompactLoadingSkeleton />}>
           <CategoryPets species={resolvedParams.species} />
         </Suspense>
       </div>
-    </div>
+
+      {/* Enhanced Schema.org JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": `${category.name} - Alle Rassen & Arten`,
+            "description": config?.description || category.description,
+            "url": `https://tailr.wiki/${resolvedParams.species}`,
+            "mainEntity": {
+              "@type": "ItemList",
+              "numberOfItems": petCount,
+              "itemListElement": []
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://tailr.wiki"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": category.name,
+                  "item": `https://tailr.wiki/${resolvedParams.species}`
+                }
+              ]
+            }
+          })
+        }}
+      />
+    </main>
   )
 }
