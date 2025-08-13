@@ -679,27 +679,6 @@ export default function HomePage() {
       }>
         <RecentBlogSection />
       </Suspense>
-
-      {/* ✅ FINAL CTA - Extrem kompakt */}
-      <section className="py-6 lg:py-8 bg-gradient-to-r from-primary/5 to-secondary/5">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-lg lg:text-xl font-bold mb-2">
-            Bereit, Ihren perfekten Begleiter zu finden?
-          </h2>
-          <p className="text-sm text-base-content/70 max-w-lg mx-auto mb-4">
-            Durchstöbern Sie unsere Datenbank oder nutzen Sie unsere intelligente Suche
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/search" className="btn btn-primary btn-sm">
-              Jetzt suchen
-            </Link>
-            <Link href="/dogs" className="btn btn-outline btn-sm">
-              Kategorien durchstöbern
-            </Link>
-          </div>
-        </div>
-      </section>
     </main>
   )
 }
