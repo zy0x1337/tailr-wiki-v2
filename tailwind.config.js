@@ -5,238 +5,378 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
-      // ✅ Custom Color Palette für TAILR.WIKI
+      // ✅ SCIENTIFIC RAINBOW COLOR EXTENSIONS (zusätzlich zu DaisyUI)
       colors: {
-        // Brand Colors
-        brand: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+        // ✅ SYNCHRONIZED Scientific Trust Colors (mit globals.css)
+        'trust-value': {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e', // Kostenlos - Grün (used in --nature-glow)
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
         },
-        // Additional accent colors für Species-Kategorien
-        accent: {
-          amber: '#f59e0b',
-          emerald: '#10b981',
-          rose: '#f43f5e',
-          violet: '#8b5cf6',
-          cyan: '#06b6d4',
-          lime: '#65a30d',
-        }
+        'trust-tech': {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6', // Mobile - Blau (used in --trust-glow) ✅ SYNCED
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+        'trust-security': {
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#a855f7', // DSGVO - Violett (used in --expertise-glow) ✅ SYNCED
+          600: '#9333ea',
+          700: '#7c3aed',
+          800: '#6b21a8',
+          900: '#581c87',
+        },
+
+        // Scientific Data Colors (Stats Section)
+        'data-primary': {
+          50: '#ecfeff',
+          100: '#cffafe',
+          200: '#a5f3fc',
+          300: '#67e8f9',
+          400: '#22d3ee',
+          500: '#06b6d4', // Cyan - Klarheit
+          600: '#0891b2',
+          700: '#0e7490',
+          800: '#155e75',
+          900: '#164e63',
+        },
+        'data-secondary': {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6', // Blue - Vertrauen
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+        'data-tertiary': {
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1', // Indigo - Tiefes Wissen
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+        },
+
+        // Scientific Excellence Colors (Why Section)
+        'excellence-research': {
+          50: '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f5d0fe',
+          300: '#f0abfc',
+          400: '#e879f9',
+          500: '#d946ef', // Magenta - Forschung
+          600: '#c026d3',
+          700: '#a21caf',
+          800: '#86198f',
+          900: '#701a75',
+        },
+        'excellence-comprehensive': {
+          50: '#fff1f2',
+          100: '#ffe4e6',
+          200: '#fecdd3',
+          300: '#fda4af',
+          400: '#fb7185',
+          500: '#f43f5e', // Rose - Umfassend
+          600: '#e11d48',
+          700: '#be123c',
+          800: '#9f1239',
+          900: '#881337',
+        },
+        'excellence-reliable': {
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6', // Violet - Zuverlässig
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+        },
       },
-      
-      // ✅ Typography Scale für moderne Layouts
-      fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
-        '2xl': ['1.5rem', { lineHeight: '2rem' }],
-        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-        '5xl': ['3rem', { lineHeight: '1.1' }],
-        '6xl': ['3.75rem', { lineHeight: '1.1' }],
-        '7xl': ['4.5rem', { lineHeight: '1.1' }],
-        '8xl': ['6rem', { lineHeight: '1.1' }],
-        '9xl': ['8rem', { lineHeight: '1.1' }],
+
+      // ✅ SCIENTIFIC TYPOGRAPHY
+      fontFamily: {
+        sans: [
+          'Inter',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'sans-serif'
+        ],
+        mono: [
+          'JetBrains Mono',
+          'Fira Code',
+          'Monaco',
+          'Consolas',
+          'monospace'
+        ],
       },
-      
-      // ✅ Enhanced Background Images
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'hero-pattern': "url('/hero-pattern.svg')",
-        'species-gradient': 'linear-gradient(135deg, var(--tw-gradient-stops))',
-      },
-      
-      // ✅ Animation & Transitions
+
+      // ✅ OPTIMIZED SCIENTIFIC ANIMATIONS
       animation: {
-        'float': 'float 6s ease-in-out infinite',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'bounce-gentle': 'bounceGentle 1s ease-in-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'wiggle': 'wiggle 1s ease-in-out infinite',
-        'spin-slow': 'spin 3s linear infinite',
-        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+        // ✅ SHINE Animations (used by Why Section)
+        'shine': 'shine 1.5s ease-in-out',
+        'shine-slow': 'shine 3s ease-in-out',
+        
+        // ✅ SCIENTIFIC Pulses
+        'pulse-scientific': 'pulse-scientific 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'pulse-data': 'pulse-data 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        
+        // ✅ LIVE Indicators
+        'live-pulse': 'live-pulse 2s ease-in-out infinite',
+        'live-breathe': 'live-breathe 4s ease-in-out infinite',
+        
+        // ✅ HOVER Effects
+        'float': 'float 3s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
       },
-      
+
+      // ✅ ESSENTIAL KEYFRAMES (Supporting animations)
       keyframes: {
+        // ✅ SCIENTIFIC Pulses
+        'pulse-scientific': {
+          '0%, 100%': {
+            opacity: '1',
+            transform: 'scale(1)'
+          },
+          '50%': {
+            opacity: '0.8',
+            transform: 'scale(1.05)'
+          },
+        },
+        'pulse-data': {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '1' }
+        },
+
+        // ✅ LIVE Indicators
+        'live-pulse': {
+          '0%, 100%': {
+            opacity: '0.4',
+            transform: 'scale(0.95)'
+          },
+          '50%': {
+            opacity: '1',
+            transform: 'scale(1.1)'
+          },
+        },
+        'live-breathe': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.03)' }
+        },
+
+        // ✅ HOVER Effects
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '50%': { transform: 'translateY(-4px)' }
         },
-        slideUp: {
-          '0%': { transform: 'translateY(100%)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        glow: {
+          '0%': { 'box-shadow': '0 0 5px currentColor' },
+          '100%': { 'box-shadow': '0 0 20px currentColor, 0 0 30px currentColor' }
         },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        bounceGentle: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-5px)' },
-        },
-        wiggle: {
-          '0%, 100%': { transform: 'rotate(-3deg)' },
-          '50%': { transform: 'rotate(3deg)' },
-        }
       },
-      
-      // ✅ Spacing für moderne Layouts
+
+      // ✅ SCIENTIFIC SPACING & SIZING
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
         '128': '32rem',
-        '144': '36rem',
       },
-      
-      // ✅ Container Queries Support
-      screens: {
-        'xs': '475px',
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1536px',
-      },
-      
-      // ✅ Box Shadow für Cards - Dark Mode optimiert
+
+      // ✅ SCIENTIFIC SHADOWS
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 30px -5px rgba(0, 0, 0, 0.05)',
-        'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 20px 50px -10px rgba(0, 0, 0, 0.1)',
-        'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
-        'glow-lg': '0 0 40px rgba(59, 130, 246, 0.2)',
-        // Dark mode shadows
-        'soft-dark': '0 2px 15px -3px rgba(0, 0, 0, 0.3), 0 10px 20px -2px rgba(0, 0, 0, 0.2)',
-        'medium-dark': '0 4px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 30px -5px rgba(0, 0, 0, 0.3)',
-        'strong-dark': '0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 20px 50px -10px rgba(0, 0, 0, 0.4)',
+        'glow-sm': '0 0 10px rgba(59, 130, 246, 0.3)',
+        'glow-md': '0 0 20px rgba(59, 130, 246, 0.4)',
+        'glow-lg': '0 0 30px rgba(59, 130, 246, 0.5)',
+        'scientific': '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1)',
+        'data': '0 8px 32px rgba(59, 130, 246, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08)',
       },
-      
-      // ✅ Border Radius für moderne Cards
-      borderRadius: {
-        'xl': '1rem',
-        '2xl': '1.5rem',
-        '3xl': '2rem',
+
+      // ✅ SCIENTIFIC GRADIENTS
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-scientific': 'linear-gradient(135deg, var(--tw-gradient-stops))',
+        'gradient-data': 'linear-gradient(45deg, var(--tw-gradient-stops))',
+        'shine-overlay': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
       },
-      
-      // ✅ Line Clamp für Text-Truncation
-      lineClamp: {
-        7: '7',
-        8: '8',
-        9: '9',
-        10: '10',
-      },
-      
-      // ✅ Backdrop Blur
+
+      // ✅ SCIENTIFIC BLUR
       backdropBlur: {
-        'xs': '2px',
-      }
+        'scientific': '12px',
+      },
+
+      // ✅ SCIENTIFIC BORDERS
+      borderRadius: {
+        'scientific': '0.75rem',
+        'data': '1rem',
+      },
     },
   },
-  
-  // ✅ Plugins
+
+  // ✅ PLUGINS - DaisyUI + Scientific Utilities
   plugins: [
+    // DaisyUI Plugin - MUST BE FIRST
     require('daisyui'),
+
+    // Glassmorphism Plugin
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.glassmorphism': {
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+        },
+        '.glassmorphism-dark': {
+          background: 'rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+        }
+      }
+      addUtilities(newUtilities)
+    },
+
+    // Scientific Utilities Plugin
+    function({ addComponents }) {
+      const components = {
+        '.scientific-card': {
+          '@apply bg-base-100/80 dark:bg-base-100/10 backdrop-blur-md border border-base-300/30 dark:border-base-700/30 rounded-scientific shadow-scientific transition-all duration-300': {},
+        },
+        '.data-card': {
+          '@apply bg-base-100/90 dark:bg-base-100/10 backdrop-blur-scientific border border-blue-200/30 dark:border-blue-700/30 rounded-data shadow-data': {},
+        },
+        '.trust-card-scientific': {
+          '@apply scientific-card hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02] p-3 text-center group cursor-pointer': {},
+        },
+      }
+      addComponents(components)
+    },
   ],
-  
-  // ✅ daisyUI Konfiguration - Optimiert für TAILR.WIKI
+
+  // ✅ DAISYUI CONFIGURATION
   daisyui: {
     themes: [
+      // ✅ SCIENTIFIC LIGHT THEME
       {
-        // Light Theme - Custom für TAILR.WIKI
-        light: {
-          "primary": "#0ea5e9",           // Sky Blue
-          "primary-content": "#ffffff",
-          "secondary": "#f59e0b",         // Amber
-          "secondary-content": "#ffffff",
-          "accent": "#10b981",            // Emerald
-          "accent-content": "#ffffff",
-          "neutral": "#374151",           // Gray 700
-          "neutral-content": "#f9fafb",   // Gray 50
-          "base-100": "#ffffff",          // White
-          "base-200": "#f9fafb",          // Gray 50
-          "base-300": "#f3f4f6",          // Gray 100
-          "base-content": "#1f2937",      // Gray 800
-          "info": "#3b82f6",              // Blue 500
-          "info-content": "#ffffff",
-          "success": "#10b981",           // Emerald 500
-          "success-content": "#ffffff",
-          "warning": "#f59e0b",           // Amber 500
-          "warning-content": "#ffffff",
-          "error": "#ef4444",             // Red 500
-          "error-content": "#ffffff",
-        },
-        // Dark Theme - Custom für TAILR.WIKI
-        dark: {
-          "primary": "#38bdf8",           // Sky 400
-          "primary-content": "#0f172a",   // Slate 900
-          "secondary": "#fbbf24",         // Amber 400
-          "secondary-content": "#0f172a",
-          "accent": "#34d399",            // Emerald 400
-          "accent-content": "#0f172a",
-          "neutral": "#1f2937",           // Gray 800
-          "neutral-content": "#f9fafb",
-          "base-100": "#0f172a",          // Slate 900
-          "base-200": "#1e293b",          // Slate 800
-          "base-300": "#334155",          // Slate 700
-          "base-content": "#f1f5f9",      // Slate 100
-          "info": "#60a5fa",              // Blue 400
-          "info-content": "#0f172a",
-          "success": "#4ade80",           // Green 400
-          "success-content": "#0f172a",
-          "warning": "#fbbf24",           // Amber 400
-          "warning-content": "#0f172a",
-          "error": "#f87171",             // Red 400
-          "error-content": "#0f172a",
+        'scientific-light': {
+          'primary': '#3b82f6', // Blue ✅ SYNCED with trust-tech.500
+          'primary-focus': '#2563eb',
+          'primary-content': '#ffffff',
+          'secondary': '#06b6d4', // Cyan
+          'secondary-focus': '#0891b2',
+          'secondary-content': '#ffffff',
+          'accent': '#8b5cf6', // Violet
+          'accent-focus': '#7c3aed',
+          'accent-content': '#ffffff',
+          'neutral': '#374151', // Gray
+          'neutral-focus': '#1f2937',
+          'neutral-content': '#ffffff',
+          'base-100': '#ffffff', // White background
+          'base-200': '#f9fafb', // Very light gray
+          'base-300': '#f3f4f6', // Light gray
+          'base-content': '#1f2937', // Dark text
+          'info': '#06b6d4', // Cyan
+          'success': '#10b981', // Green
+          'warning': '#f59e0b', // Amber
+          'error': '#ef4444', // Red
+
+          // ✅ SYNCHRONIZED SCIENTIFIC TRUST COLORS
+          '--trust-value': '#22c55e', // Green - Kostenlos ✅ SYNCED
+          '--trust-tech': '#3b82f6', // Blue - Technology ✅ SYNCED
+          '--trust-security': '#a855f7', // Purple - Security ✅ SYNCED
+
+          // ✅ SCIENTIFIC DATA COLORS
+          '--data-primary': '#06b6d4', // Cyan
+          '--data-secondary': '#3b82f6', // Blue
+          '--data-tertiary': '#6366f1', // Indigo
+
+          // ✅ SCIENTIFIC EXCELLENCE COLORS
+          '--excellence-research': '#d946ef', // Magenta
+          '--excellence-comprehensive': '#f43f5e', // Rose
+          '--excellence-reliable': '#8b5cf6', // Violet
         },
       },
+
+      // ✅ SCIENTIFIC DARK THEME
+      {
+        'scientific-dark': {
+          'primary': '#60a5fa', // Light blue
+          'primary-focus': '#3b82f6',
+          'primary-content': '#1e3a8a',
+          'secondary': '#22d3ee', // Light cyan
+          'secondary-focus': '#06b6d4',
+          'secondary-content': '#164e63',
+          'accent': '#a78bfa', // Light violet
+          'accent-focus': '#8b5cf6',
+          'accent-content': '#4c1d95',
+          'neutral': '#374151',
+          'neutral-focus': '#4b5563',
+          'neutral-content': '#f3f4f6',
+          'base-100': '#1f2937', // Dark background
+          'base-200': '#374151', // Medium dark
+          'base-300': '#4b5563', // Light dark
+          'base-content': '#f3f4f6', // Light text
+          'info': '#22d3ee',
+          'success': '#34d399',
+          'warning': '#fbbf24',
+          'error': '#f87171',
+
+          // ✅ SYNCHRONIZED SCIENTIFIC TRUST COLORS (Dark Mode)
+          '--trust-value': '#4ade80', // Light green ✅ SYNCED
+          '--trust-tech': '#60a5fa', // Light blue ✅ SYNCED  
+          '--trust-security': '#c084fc', // Light purple ✅ SYNCED
+
+          // ✅ SCIENTIFIC DATA COLORS (Dark Mode)
+          '--data-primary': '#67e8f9', // Light cyan
+          '--data-secondary': '#93c5fd', // Light blue
+          '--data-tertiary': '#a5b4fc', // Light indigo
+
+          // ✅ SCIENTIFIC EXCELLENCE COLORS (Dark Mode)
+          '--excellence-research': '#e879f9', // Light magenta
+          '--excellence-comprehensive': '#fb7185', // Light rose
+          '--excellence-reliable': '#a78bfa', // Light violet
+        },
+      },
+
+      'light', // Fallback
+      'dark'   // Fallback
     ],
-    darkTheme: "dark",
     base: true,
     styled: true,
     utils: true,
-    rtl: false,
-    prefix: "",
-    logs: false,
+    prefix: '',
+    logs: true,
+    themeRoot: ':root',
   },
-  
-  // ✅ Purge Optimization für Production
-  future: {
-    hoverOnlyWhenSupported: true,
-  },
-  
-  // ✅ Safelist für dynamische Classes
-  safelist: [
-    'animate-pulse',
-    'animate-bounce',
-    'animate-float',
-    // daisyUI badge colors
-    'badge-primary',
-    'badge-secondary',
-    'badge-accent',
-    'badge-outline',
-    // Button variants
-    'btn-primary',
-    'btn-secondary',
-    'btn-outline',
-    'btn-lg',
-    'btn-sm',
-  ]
 }

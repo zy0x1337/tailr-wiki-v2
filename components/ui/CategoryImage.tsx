@@ -1,33 +1,77 @@
-// components/ui/CategoryImage.tsx - Mit Zoom und runden Ecken
-'use client'
+"use client"
 
-import { useState } from 'react'
 import Image from 'next/image'
+import { useState } from 'react'
 
 interface CategoryImageProps {
-  src: string
+  src?: string
   alt: string
-  fallbackEmoji: string
+  fallbackEmoji?: string
   size?: number
   className?: string
+  priority?: boolean
 }
 
-export default function CategoryImage({ 
-  src, 
-  alt, 
-  fallbackEmoji, 
-  size = 120,
-  className = ''
+export default function CategoryImage({
+  src,
+  alt,
+  fallbackEmoji = "🐾",
+  size = 64,
+  className = "",
+  priority = false
 }: CategoryImageProps) {
-  const [imageError, setImageError] = useState(false)
+  const [hasError, setHasError] = useState(false)
+  
+  // ✅ LÖSUNG: Ignoriere Database-Pfade, verwende WebP-Mapping
+  const getImagePath = (): string => {
+    // ✅ FORCE WEBP: Ignoriere Database-Werte, verwende immer WebP
+    const categoryName = alt.toLowerCase().trim()
+    
+    const webpMapping: Record<string, string> = {
+      // Deutsche Category-Namen → WebP-Dateien in public/images/categories/
+      'hunde': '/images/categories/dog.webp',
+      'katzen': '/images/categories/cat.webp',
+      'aquarienfische': '/images/categories/fish.webp',
+      'fische': '/images/categories/fish.webp',
+      'nager & kleintiere': '/images/categories/rodent.webp',
+      'nagetiere': '/images/categories/rodent.webp',
+      'reptilien': '/images/categories/reptile.webp',
+      'ziervögel': '/images/categories/bird.webp',
+      'vögel': '/images/categories/bird.webp',
+      'kaninchen': '/images/categories/rabbit.webp'
+    }
+    
+    // Direkte Mapping-Suche
+    const webpPath = webpMapping[categoryName]
+    if (webpPath) {
+      console.log(`✅ WebP-Mapping gefunden: ${categoryName} → ${webpPath}`)
+      return webpPath
+    }
+    
+    // Fallback: Standard WebP basierend auf Category-Namen
+    console.log(`⚠️ Kein Mapping für: ${categoryName}, verwende Fallback`)
+    return '/images/categories/dog.webp' // Temporärer Fallback
+  }
 
-  if (imageError) {
+  const imagePath = getImagePath()
+  
+  // ✅ DEBUGGING: Zeige Pfad-Umleitung
+  console.log(`🔄 CategoryImage Redirect:`, {
+    categoryName: alt,
+    ignoredDBPath: src, // Database-Pfad wird ignoriert
+    webpPath: imagePath
+  })
+  
+  if (hasError) {
     return (
       <div 
-        className={`flex items-center justify-center rounded-2xl transition-all duration-300 hover:scale-105 ${className}`}
-        style={{ width: size, height: size, fontSize: size * 0.6 }}
+        className={`flex items-center justify-center bg-gradient-to-br from-base-200 to-base-300 dark:from-base-700 dark:to-base-800 rounded-lg ${className}`}
+        style={{ width: size, height: size }}
       >
-        <span className="filter drop-shadow-lg">
+        <span 
+          className="text-base-content/60 dark:text-base-content/40"
+          style={{ fontSize: size * 0.5 }}
+        >
           {fallbackEmoji}
         </span>
       </div>
@@ -35,25 +79,27 @@ export default function CategoryImage({
   }
 
   return (
-    <div 
-      className="relative rounded-2xl overflow-hidden group cursor-pointer" 
-      style={{ width: size, height: size }}
-    >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes={`${size}px`}
-        className={`object-cover rounded-2xl transition-all duration-500 group-hover:scale-110 ${className}`}
-        style={{
-          transformOrigin: 'center center',
-          willChange: 'transform'
-        }}
-        onError={() => setImageError(true)}
-      />
-      
-      {/* Subtle Hover Glow */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-    </div>
+    <Image
+      src={imagePath}
+      alt={alt}
+      width={size}
+      height={size}
+      className={`object-cover ${className}`}
+      priority={priority}
+      onError={(e) => {
+        console.error(`❌ WebP-Bild nicht gefunden:`, {
+          webpPath: imagePath,
+          category: alt
+        })
+        setHasError(true)
+      }}
+      onLoad={() => {
+        console.log(`✅ WebP-Bild erfolgreich geladen:`, {
+          webpPath: imagePath,
+          category: alt
+        })
+      }}
+      sizes={`${size}px`}
+    />
   )
 }
