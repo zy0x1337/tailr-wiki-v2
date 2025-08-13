@@ -528,9 +528,9 @@ export default async function SpeciesPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen">
-      <nav className="bg-base-100/95 backdrop-blur-sm border-b border-base-300 sticky top-6 z-40">
+      <nav className="bg-base-100/95 backdrop-blur-sm border-b border-base-300 sticky top-0 z-40">
         <div className="container mx-auto px-4">
-          <div className="h-6 flex items-center">
+          <div className="h-3 flex items-center">
             <div className="breadcrumbs text-sm">
               <ul className="flex items-center gap-2">
                 <li>
